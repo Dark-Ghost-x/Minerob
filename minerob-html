@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Minerob</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #0d1428;
+            --secondary: #1a2a6c;
+            --accent: #ffce54;
+            --dark: #050a15;
+            --light: #e9ecef;
+            --player-color: #ff5252;
+            --ai-color: #4fc3f7;
+            --safe-color: #4caf50;
+            --danger-color: #f44336;
+            --card-bg: #1e2a4a;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --cell-bg: #2d3748;
+            --cell-hover: #4a5568;
+        }
+        
+        [data-theme="light"] {
+            --primary: #e9ecef;
+            --secondary: #dee2e6;
+            --accent: #ff922b;
+            --dark: #f8f9fa;
+            --light: #212529;
+            --player-color: #e03131;
+            --ai-color: #1971c2;
+            --safe-color: #2f9e44;
+            --danger-color: #e03131;
+            --card-bg: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --cell-bg: #f8f9fa;
+            --cell-hover: #e9ecef;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-switch:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .theme-icon {
+            font-size: 1.2rem;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, var(--accent), #ffa726);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .setup-screen {
+            margin: 20px 0;
+        }
+        
+        .player-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .player-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .player-input label {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+        
+        .player-input input {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            border: none;
+            width: 100%;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-selector {
+            margin: 25px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .difficulty-btn {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border: none;
+            padding: 18px 35px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            min-width: 160px;
+            max-width: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .difficulty-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .difficulty-btn:hover::before {
+            left: 100%;
+        }
+        
+        .difficulty-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .difficulty-btn.easy {
+            background: linear-gradient(135deg, #009933, #00cc66);
+        }
+        
+        .difficulty-btn.medium {
+            background: linear-gradient(135deg, #ff9900, #ffcc00);
+        }
+        
+        .difficulty-btn.hard {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin: 25px auto;
+            max-width: 800px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        
+        .cell {
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cell-bg);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+        
+        .cell:hover {
+            background: var(--cell-hover);
+            transform: scale(1.08);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cell.mine {
+            background: linear-gradient(135deg, var(--danger-color), #990000);
+            animation: pulse 0.5s infinite alternate;
+            color: white;
+        }
+        
+        .cell.ai-mine {
+            background: linear-gradient(135deg, var(--ai-color), #0066ff);
+            animation: pulse 0.5s infinite alternate;
+            color: white;
+        }
+        
+        .cell.hidden {
+            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+            color: var(--text-primary);
+        }
+        
+        .cell.safe {
+            background: linear-gradient(135deg, var(--safe-color), #2e7d32);
+            color: white;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .player-score, .ai-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .player-score {
+            background: rgba(255, 82, 82, 0.1);
+            border: 2px solid rgba(255, 82, 82, 0.3);
+        }
+        
+        .ai-score {
+            background: rgba(79, 195, 247, 0.1);
+            border: 2px solid rgba(79, 195, 247, 0.3);
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        .player-score .score-value {
+            color: var(--player-color);
+        }
+        
+        .ai-score .score-value {
+            color: var(--ai-color);
+        }
+        
+        .player-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .message {
+            font-size: 1.6rem;
+            margin: 20px 0;
+            min-height: 50px;
+            color: var(--accent);
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, var(--accent), #ffa726);
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .turn-indicator {
+            font-size: 1.4rem;
+            margin: 15px 0;
+            padding: 12px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .player-turn {
+            background: rgba(255, 82, 82, 0.2);
+            border: 2px solid rgba(255, 82, 82, 0.5);
+        }
+        
+        .ai-turn {
+            background: rgba(79, 195, 247, 0.2);
+            border: 2px solid rgba(79, 195, 247, 0.5);
+        }
+        
+        @keyframes pulse {
+            from { opacity: 0.7; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.05); }
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .explosion {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--danger-color) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: explode 0.5s forwards;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(10, 1fr);
+                gap: 6px;
+            }
+            
+            .cell {
+                font-size: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .difficulty-btn {
+                padding: 15px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .player-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-board {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .game-board {
+                grid-template-columns: repeat(10, 1fr);
+            }
+            
+            .cell {
+                font-size: 1.3rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .difficulty-btn {
+                min-width: 140px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-bomb"></i> مین‌یابی - Minerob</h1>
+            <div class="theme-switch" id="themeSwitch">
+                <i class="fas fa-moon theme-icon" id="themeIcon"></i>
+                <span id="themeText">تاریک</span>
+            </div>
+        </div>
+        
+        <div class="setup-screen" id="setupScreen">
+            <div class="player-inputs">
+                <div class="player-input">
+                    <label for="playerName"><i class="fas fa-user"></i> نام شما:</label>
+                    <input type="text" id="playerName" placeholder="نام بازیکن" value="شما">
+                </div>
+                
+                <div class="player-input">
+                    <label for="aiName"><i class="fas fa-robot"></i> نام حریف:</label>
+                    <input type="text" id="aiName" placeholder="نام حریف" value="هوش مصنوعی">
+                </div>
+            </div>
+            
+            <div class="difficulty-selector">
+                <button class="difficulty-btn easy" data-level="1">
+                    <i class="fas fa-star"></i> آسان
+                </button>
+                <button class="difficulty-btn medium" data-level="2">
+                    <i class="fas fa-star-half-alt"></i> متوسط
+                </button>
+                <button class="difficulty-btn hard" data-level="3">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i> سخت
+                </button>
+            </div>
+        </div>
+        
+        <div class="score-board" style="display: none;" id="scoreBoard">
+            <div class="player-score">
+                <div class="player-name" id="playerNameDisplay">شما</div>
+                <div class="score-value" id="playerScore">0</div>
+            </div>
+            <div class="ai-score">
+                <div class="player-name" id="aiNameDisplay">هوش مصنوعی</div>
+                <div class="score-value" id="aiScore">0</div>
+            </div>
+        </div>
+        
+        <div class="turn-indicator" id="turnIndicator" style="display: none;"></div>
+        
+        <div class="message" id="message">
+            <i class="fas fa-info-circle"></i> لطفا سطح دشواری را انتخاب کنید
+        </div>
+        
+        <div class="game-board" id="gameBoard" style="display: none;"></div>
+        
+        <button class="restart-btn" id="restartBtn" style="display:none;">
+            <i class="fas fa-redo"></i> بازی مجدد
+        </button>
+    </div>
+
+    <audio id="mineSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-explosion-rumble-2796.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="safeSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="winSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="loseSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sad-game-over-2945.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const BOARD_SIZE = 56;
+        const MINES_COUNT = 14;
+        
+        let gameState = {
+            board: [],
+            playerHits: new Set(),
+            aiHits: new Set(),
+            hiddenCells: new Set(),
+            difficulty: 1,
+            currentPlayer: 'human',
+            gameStarted: false,
+            playerName: 'شما',
+            aiName: 'هوش مصنوعی',
+            theme: 'dark'
+        };
+        
+        const elements = {
+            themeSwitch: document.getElementById('themeSwitch'),
+            themeIcon: document.getElementById('themeIcon'),
+            themeText: document.getElementById('themeText'),
+            setupScreen: document.getElementById('setupScreen'),
+            gameBoard: document.getElementById('gameBoard'),
+            playerScore: document.getElementById('playerScore'),
+            aiScore: document.getElementById('aiScore'),
+            playerNameDisplay: document.getElementById('playerNameDisplay'),
+            aiNameDisplay: document.getElementById('aiNameDisplay'),
+            message: document.getElementById('message'),
+            restartBtn: document.getElementById('restartBtn'),
+            turnIndicator: document.getElementById('turnIndicator'),
+            playerNameInput: document.getElementById('playerName'),
+            aiNameInput: document.getElementById('aiName'),
+            scoreBoard: document.getElementById('scoreBoard')
+        };
+        
+        const sounds = {
+            mineSound: document.getElementById('mineSound'),
+            safeSound: document.getElementById('safeSound'),
+            winSound: document.getElementById('winSound'),
+            loseSound: document.getElementById('loseSound')
+        };
+        
+        const AI_DIFFICULTY = {
+            1: { name: "آسان", delay: 2000, strategy: "random", accuracy: 0.6 },
+            2: { name: "متوسط", delay: 1500, strategy: "smart_random", accuracy: 0.75 },
+            3: { name: "سخت", delay: 1000, strategy: "pattern", accuracy: 0.9 }
+        };
+        
+        function toggleTheme() {
+            if (gameState.theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                gameState.theme = 'light';
+                elements.themeIcon.className = 'fas fa-sun theme-icon';
+                elements.themeText.textContent = 'روشن';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                gameState.theme = 'dark';
+                elements.themeIcon.className = 'fas fa-moon theme-icon';
+                elements.themeText.textContent = 'تاریک';
+            }
+        }
+        
+        function createBoard() {
+            const board = Array(MINES_COUNT).fill('💣').concat(Array(BOARD_SIZE - MINES_COUNT).fill(' '));
+            
+            for (let i = board.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [board[i], board[j]] = [board[j], board[i]];
+            }
+            
+            return board;
+        }
+        
+        function renderBoard() {
+            elements.gameBoard.innerHTML = '';
+            
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell hidden';
+                cell.dataset.index = i;
+                
+                if (gameState.hiddenCells.has(i + 1)) {
+                    cell.textContent = i + 1;
+                } else if (gameState.playerHits.has(i + 1)) {
+                    cell.className = 'cell mine';
+                    cell.textContent = '💣';
+                } else if (gameState.aiHits.has(i + 1)) {
+                    cell.className = 'cell ai-mine';
+                    cell.textContent = '💣';
+                } else {
+                    cell.className = 'cell safe';
+                    cell.textContent = '';
+                }
+                
+                if (gameState.hiddenCells.has(i + 1) && gameState.currentPlayer === 'human' && gameState.gameStarted) {
+                    cell.addEventListener('click', () => handlePlayerMove(i + 1));
+                }
+                
+                elements.gameBoard.appendChild(cell);
+            }
+            
+            elements.playerScore.textContent = gameState.playerHits.size;
+            elements.aiScore.textContent = gameState.aiHits.size;
+            
+            updateTurnIndicator();
+        }
+        
+        function updateTurnIndicator() {
+            if (!gameState.gameStarted) {
+                elements.turnIndicator.textContent = '';
+                elements.turnIndicator.className = 'turn-indicator';
+                return;
+            }
+            
+            if (gameState.currentPlayer === 'human') {
+                elements.turnIndicator.textContent = `نوبت: ${gameState.playerName}`;
+                elements.turnIndicator.className = 'turn-indicator player-turn';
+            } else {
+                elements.turnIndicator.textContent = `نوبت: ${gameState.aiName}`;
+                elements.turnIndicator.className = 'turn-indicator ai-turn';
+            }
+        }
+        
+        function startGame(difficulty) {
+            gameState = {
+                board: createBoard(),
+                playerHits: new Set(),
+                aiHits: new Set(),
+                hiddenCells: new Set(Array.from({length: BOARD_SIZE}, (_, i) => i + 1)),
+                difficulty: difficulty,
+                currentPlayer: 'human',
+                gameStarted: true,
+                playerName: elements.playerNameInput.value || 'شما',
+                aiName: elements.aiNameInput.value || 'هوش مصنوعی',
+                theme: gameState.theme
+            };
+            
+            elements.playerNameDisplay.textContent = gameState.playerName;
+            elements.aiNameDisplay.textContent = gameState.aiName;
+            
+            elements.setupScreen.style.display = 'none';
+            elements.scoreBoard.style.display = 'flex';
+            elements.turnIndicator.style.display = 'block';
+            elements.gameBoard.style.display = 'grid';
+            
+            elements.message.innerHTML = `<i class="fas fa-flag"></i> سطح: ${AI_DIFFICULTY[difficulty].name} - نوبت ${gameState.playerName} است!`;
+            elements.restartBtn.style.display = 'none';
+            
+            renderBoard();
+        }
+        
+        function handlePlayerMove(cellNumber) {
+            if (!gameState.gameStarted || gameState.currentPlayer !== 'human') return;
+            
+            gameState.hiddenCells.delete(cellNumber);
+            
+            if (gameState.board[cellNumber - 1] === '💣') {
+                gameState.playerHits.add(cellNumber);
+                
+                sounds.mineSound.currentTime = 0;
+                sounds.mineSound.play().catch(e => console.log("Audio play failed"));
+                
+                createExplosionEffect(cellNumber);
+                
+                elements.message.innerHTML = `<i class="fas fa-fire"></i> آفرین! ${gameState.playerName} یک مین پیدا کرد. 🔴`;
+                
+                if (gameState.playerHits.size + gameState.aiHits.size >= MINES_COUNT) {
+                    endGame();
+                    return;
+                }
+                
+                renderBoard();
+            } else {
+                sounds.safeSound.currentTime = 0;
+                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
+                
+                elements.message.innerHTML = `<i class="fas fa-forward"></i> خالی بود! نوبت ${gameState.aiName}.`;
+                gameState.currentPlayer = 'ai';
+                renderBoard();
+                
+                setTimeout(() => makeAIMove(), 1000);
+            }
+        }
+        
+        function makeAIMove() {
+            if (!gameState.gameStarted || gameState.currentPlayer !== 'ai') return;
+            
+            const difficultySettings = AI_DIFFICULTY[gameState.difficulty];
+            let aiChoice;
+            
+            if (difficultySettings.strategy === "random") {
+                const availableCells = Array.from(gameState.hiddenCells);
+                aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
+            } else if (difficultySettings.strategy === "smart_random") {
+                const availableCells = Array.from(gameState.hiddenCells);
+                aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
+                
+                if (Math.random() > difficultySettings.accuracy) {
+                    const safeCells = availableCells.filter(cell => gameState.board[cell - 1] === ' ');
+                    if (safeCells.length > 0) {
+                        aiChoice = safeCells[Math.floor(Math.random() * safeCells.length)];
+                    }
+                }
+            } else {
+                const availableCells = Array.from(gameState.hiddenCells);
+                const primeCells = availableCells.filter(isPrime);
+                
+                if (primeCells.length > 0 && Math.random() < 0.7) {
+                    aiChoice = primeCells[Math.floor(Math.random() * primeCells.length)];
+                } else {
+                    aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
+                }
+            }
+            
+            gameState.hiddenCells.delete(aiChoice);
+            
+            if (gameState.board[aiChoice - 1] === '💣') {
+                gameState.aiHits.add(aiChoice);
+                
+                sounds.mineSound.currentTime = 0;
+                sounds.mineSound.play().catch(e => console.log("Audio play failed"));
+                
+                createExplosionEffect(aiChoice);
+                
+                elements.message.innerHTML = `<i class="fas fa-robot"></i> ${gameState.aiName} یک مین پیدا کرد! 🔵`;
+                
+                if (gameState.playerHits.size + gameState.aiHits.size >= MINES_COUNT) {
+                    endGame();
+                    return;
+                }
+                
+                setTimeout(() => makeAIMove(), difficultySettings.delay);
+                renderBoard();
+            } else {
+                sounds.safeSound.currentTime = 0;
+                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
+                
+                elements.message.innerHTML = `<i class="fas fa-backward"></i> ${gameState.aiName} اشتباه کرد! نوبت ${gameState.playerName}.`;
+                gameState.currentPlayer = 'human';
+                renderBoard();
+            }
+        }
+        
+        function isPrime(num) {
+            if (num <= 1) return false;
+            if (num <= 3) return true;
+            if (num % 2 === 0 || num % 3 === 0) return false;
+            for (let i = 5; i * i <= num; i += 6) {
+                if (num % i === 0 || num % (i + 2) === 0) return false;
+            }
+            return true;
+        }
+        
+        function createExplosionEffect(cellNumber) {
+            const cellIndex = cellNumber - 1;
+            const cell = document.querySelector(`.cell[data-index="${cellIndex}"]`);
+            if (cell) {
+                const explosion = document.createElement('div');
+                explosion.className = 'explosion';
+                cell.appendChild(explosion);
+                
+                setTimeout(() => {
+                    if (cell.contains(explosion)) {
+                        cell.removeChild(explosion);
+                    }
+                }, 500);
+            }
+        }
+        
+        function endGame() {
+            gameState.gameStarted = false;
+            
+            if (gameState.playerHits.size > gameState.aiHits.size) {
+                sounds.winSound.currentTime = 0;
+                sounds.winSound.play().catch(e => console.log("Audio play failed"));
+                elements.message.innerHTML = `<i class="fas fa-trophy"></i> 🎉 ${gameState.playerName} برنده شد! 🎉`;
+                elements.message.style.animation = 'celebrate 1s infinite';
+            } else if (gameState.playerHits.size < gameState.aiHits.size) {
+                sounds.loseSound.currentTime = 0;
+                sounds.loseSound.play().catch(e => console.log("Audio play failed"));
+                elements.message.innerHTML = `<i class="fas fa-robot"></i> 🤖 ${gameState.aiName} برنده شد! 🤖`;
+            } else {
+                sounds.safeSound.currentTime = 0;
+                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
+                elements.message.innerHTML = `<i class="fas fa-handshake"></i> ⚡ مساوی شد! ⚡`;
+            }
+            
+            elements.restartBtn.style.display = 'flex';
+            renderBoard();
+        }
+        
+        elements.themeSwitch.addEventListener('click', toggleTheme);
+        
+        document.querySelectorAll('.difficulty-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const difficulty = parseInt(button.dataset.level);
+                startGame(difficulty);
+            });
+        });
+        
+        elements.restartBtn.addEventListener('click', () => {
+            elements.setupScreen.style.display = 'block';
+            elements.scoreBoard.style.display = 'none';
+            elements.turnIndicator.style.display = 'none';
+            elements.gameBoard.style.display = 'none';
+            elements.message.innerHTML = `<i class="fas fa-info-circle"></i>  سطح دشواری را انتخاب کنید`;
+            elements.message.style.animation = 'none';
+            elements.restartBtn.style.display = 'none';
+            elements.playerScore.textContent = '0';
+            elements.aiScore.textContent = '0';
+            elements.turnIndicator.textContent = '';
+            elements.turnIndicator.className = 'turn-indicator';
+        });
+    </script>
+</body>
+</html>
