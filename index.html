@@ -1,853 +1,1003 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Minerob</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --primary: #0d1428;
-            --secondary: #1a2a6c;
-            --accent: #ffce54;
-            --dark: #050a15;
-            --light: #e9ecef;
-            --player-color: #ff5252;
-            --ai-color: #4fc3f7;
-            --safe-color: #4caf50;
-            --danger-color: #f44336;
-            --card-bg: #1e2a4a;
-            --text-primary: #f8f9fa;
-            --text-secondary: #adb5bd;
-            --cell-bg: #2d3748;
-            --cell-hover: #4a5568;
-        }
-        
-        [data-theme="light"] {
-            --primary: #e9ecef;
-            --secondary: #dee2e6;
-            --accent: #ff922b;
-            --dark: #f8f9fa;
-            --light: #212529;
-            --player-color: #e03131;
-            --ai-color: #1971c2;
-            --safe-color: #2f9e44;
-            --danger-color: #e03131;
-            --card-bg: #ffffff;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --cell-bg: #f8f9fa;
-            --cell-hover: #e9ecef;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .container {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .theme-switch {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .theme-switch:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .theme-icon {
-            font-size: 1.2rem;
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 20px;
-            color: var(--accent);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(to right, var(--accent), #ffa726);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .setup-screen {
-            margin: 20px 0;
-        }
-        
-        .player-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-        
-        .player-input {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .player-input label {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-primary);
-        }
-        
-        .player-input input {
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            border: none;
-            width: 100%;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            transition: all 0.3s ease;
-        }
-        
-        .difficulty-selector {
-            margin: 25px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .difficulty-btn {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            border: none;
-            padding: 18px 35px;
-            font-size: 1.3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-            flex: 1;
-            min-width: 160px;
-            max-width: 240px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .difficulty-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .difficulty-btn:hover::before {
-            left: 100%;
-        }
-        
-        .difficulty-btn:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-        }
-        
-        .difficulty-btn.easy {
-            background: linear-gradient(135deg, #009933, #00cc66);
-        }
-        
-        .difficulty-btn.medium {
-            background: linear-gradient(135deg, #ff9900, #ffcc00);
-        }
-        
-        .difficulty-btn.hard {
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-        }
-        
-        .game-board {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 10px;
-            margin: 25px auto;
-            max-width: 800px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-        }
-        
-        .cell {
-            width: 100%;
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--cell-bg);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.8rem;
-            transition: all 0.3s ease;
-            user-select: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-            color: var(--text-primary);
-        }
-        
-        .cell:hover {
-            background: var(--cell-hover);
-            transform: scale(1.08);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .cell.mine {
-            background: linear-gradient(135deg, var(--danger-color), #990000);
-            animation: pulse 0.5s infinite alternate;
-            color: white;
-        }
-        
-        .cell.ai-mine {
-            background: linear-gradient(135deg, var(--ai-color), #0066ff);
-            animation: pulse 0.5s infinite alternate;
-            color: white;
-        }
-        
-        .cell.hidden {
-            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
-            color: var(--text-primary);
-        }
-        
-        .cell.safe {
-            background: linear-gradient(135deg, var(--safe-color), #2e7d32);
-            color: white;
-        }
-        
-        .score-board {
-            display: flex;
-            justify-content: space-around;
-            margin: 25px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .player-score, .ai-score {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            border-radius: 12px;
-            min-width: 150px;
-            transition: all 0.3s ease;
-        }
-        
-        .player-score {
-            background: rgba(255, 82, 82, 0.1);
-            border: 2px solid rgba(255, 82, 82, 0.3);
-        }
-        
-        .ai-score {
-            background: rgba(79, 195, 247, 0.1);
-            border: 2px solid rgba(79, 195, 247, 0.3);
-        }
-        
-        .score-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-        
-        .player-score .score-value {
-            color: var(--player-color);
-        }
-        
-        .ai-score .score-value {
-            color: var(--ai-color);
-        }
-        
-        .player-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .message {
-            font-size: 1.6rem;
-            margin: 20px 0;
-            min-height: 50px;
-            color: var(--accent);
-            font-weight: bold;
-            padding: 15px 20px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .restart-btn {
-            background: linear-gradient(135deg, var(--accent), #ffa726);
-            border: none;
-            padding: 18px 45px;
-            font-size: 1.4rem;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-            color: #333;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .restart-btn:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-        }
-        
-        .turn-indicator {
-            font-size: 1.4rem;
-            margin: 15px 0;
-            padding: 12px 25px;
-            border-radius: 50px;
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .player-turn {
-            background: rgba(255, 82, 82, 0.2);
-            border: 2px solid rgba(255, 82, 82, 0.5);
-        }
-        
-        .ai-turn {
-            background: rgba(79, 195, 247, 0.2);
-            border: 2px solid rgba(79, 195, 247, 0.5);
-        }
-        
-        @keyframes pulse {
-            from { opacity: 0.7; transform: scale(1); }
-            to { opacity: 1; transform: scale(1.05); }
-        }
-        
-        @keyframes celebrate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.7; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        
-        .explosion {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, var(--danger-color) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: explode 0.5s forwards;
-            pointer-events: none;
-        }
-        
-        @media (max-width: 768px) {
-            .game-board {
-                grid-template-columns: repeat(10, 1fr);
-                gap: 6px;
-            }
-            
-            .cell {
-                font-size: 1.5rem;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .difficulty-btn {
-                padding: 15px 25px;
-                font-size: 1.1rem;
-            }
-            
-            .player-inputs {
-                grid-template-columns: 1fr;
-            }
-            
-            .score-board {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px 15px;
-            }
-            
-            .game-board {
-                grid-template-columns: repeat(10, 1fr);
-            }
-            
-            .cell {
-                font-size: 1.3rem;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .difficulty-btn {
-                min-width: 140px;
-                padding: 12px 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> من مینوسم تو بخون </title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00ffff;
+      --secondary: #ff6600;
+      --dark: #0f0f1a;
+      --darker: #0a0a12;
+      --light: #f8f8f8;
+      --glass: rgba(255,255,255,0.1);
+      --shadow: 0 0 15px rgba(0,255,255,0.5);
+      --red: #ff3366;
+      --purple: #8a2be2;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Exo 2', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    .snowflakes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .snowflake {
+      position: absolute;
+      top: -20px;
+      font-size: 20px;
+      color: white;
+      user-select: none;
+      opacity: 0.8;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .logo::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--red);
+      box-shadow: 0 0 15px var(--red);
+    }
+    
+    .subtitle {
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+    
+    .main-container {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(15, 15, 26, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5),
+                  inset 0 0 20px rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      z-index: 10;
+    }
+    
+    .main-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, 
+        rgba(0, 255, 255, 0.05) 0%, 
+        rgba(255, 102, 0, 0.05) 50%, 
+        rgba(138, 43, 226, 0.05) 100%);
+      z-index: -1;
+      animation: gradientShift 10s infinite alternate;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    
+    .action-box {
+      background: rgba(25, 25, 40, 0.7);
+      border-radius: 15px;
+      padding: 25px;
+      width: 100%;
+      max-width: 650px;
+      margin: 0 auto 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 102, 0, 0.3);
+    }
+    
+    .radar-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+    
+    .radar-sweep {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .radar-sweep::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--red);
+      box-shadow: 0 0 10px var(--red);
+      transform-origin: center;
+      animation: radarSweep 5s infinite linear;
+    }
+    
+    @keyframes radarSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .shooting-star {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 2px;
+      height: 30px;
+      background: linear-gradient(to bottom, transparent, white, var(--primary));
+      box-shadow: 0 0 10px white;
+      opacity: 0;
+      animation: shootingStar 5s infinite linear;
+      animation-delay: 5s;
+    }
+    
+    @keyframes shootingStar {
+      0% {
+        top: -20px;
+        left: 50%;
+        opacity: 1;
+      }
+      20% {
+        top: 50%;
+        left: 70%;
+        opacity: 1;
+      }
+      100% {
+        top: 100%;
+        left: 100%;
+        opacity: 0;
+      }
+    }
+    
+    .circular-effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+    
+    .circular-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--primary);
+      animation: circularMove 5s infinite linear;
+      animation-delay: 10s;
+      opacity: 0;
+    }
+    
+    .circular-dot:nth-child(1) { top: 0; left: 0; }
+    .circular-dot:nth-child(2) { top: 0; right: 0; }
+    .circular-dot:nth-child(3) { bottom: 0; right: 0; }
+    .circular-dot:nth-child(4) { bottom: 0; left: 0; }
+    
+    @keyframes circularMove {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      25% {
+        top: 0;
+        left: 100%;
+        transform: scale(1.5);
+      }
+      50% {
+        top: 100%;
+        left: 100%;
+        transform: scale(1);
+      }
+      75% {
+        top: 100%;
+        left: 0;
+        transform: scale(1.5);
+      }
+      100% {
+        top: 0;
+        left: 0;
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+    
+    .action-title {
+      color: var(--secondary);
+      margin-bottom: 25px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+    }
+    
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .capsule-btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      min-width: 160px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    .capsule-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+      z-index: -1;
+    }
+    
+    .capsule-btn:hover::before {
+      transform: translateX(0);
+    }
+    
+    .btn-image {
+      border: 1px solid rgba(79, 172, 254, 0.5);
+    }
+    
+    .btn-text {
+      border: 1px solid rgba(67, 233, 123, 0.5);
+    }
+    
+    .btn-telegram {
+      border: 1px solid rgba(0, 136, 204, 0.5);
+    }
+    
+    .btn-ascii-fa {
+      border: 1px solid rgba(255, 215, 0, 0.5);
+    }
+    
+    .capsule-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .capsule-btn:active {
+      transform: translateY(0);
+    }
+    
+    .smart-text-box {
+      background: rgba(20, 20, 35, 0.7);
+      border-radius: 15px;
+      padding: 30px;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    
+    .smart-text-container {
+      position: relative;
+      padding-bottom: 60px;
+    }
+    
+    .smart-text {
+      font-size: 1.3rem;
+      text-align: center;
+      color: var(--primary);
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-weight: 500;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      line-height: 1.8;
+      transition: all 0.5s ease;
+    }
+    
+    .welcome-text {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .small-text {
+      font-size: 0.8rem;
+      display: block;
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .copy-btn {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 40px;
+      background: linear-gradient(145deg, var(--purple), #9932cc);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+      transition: all 0.3s ease;
+      z-index: 2;
+      letter-spacing: 1px;
+      background: rgba(138, 43, 226, 0.2);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(138, 43, 226, 0.5);
+    }
+    
+    .copy-btn:hover {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 0 20px var(--purple);
+    }
+    
+    .copy-btn:active {
+      transform: translateX(-50%) scale(0.95);
+      box-shadow: 0 0 10px var(--purple);
+    }
+    
+    .ocean {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      z-index: -1;
+    }
+    
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="rgba(0, 255, 255, 0.07)" /><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="rgba(255, 102, 0, 0.07)" /><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="rgba(138, 43, 226, 0.07)" /></svg>');
+      background-repeat: repeat no-repeat;
+      background-position: 0 bottom;
+      transform-origin: center bottom;
+      animation: wave 12s linear infinite;
+    }
+    
+    .wave:nth-child(2) {
+      animation: wave 18s linear infinite;
+      opacity: 0.5;
+      animation-delay: -5s;
+    }
+    
+    .wave:nth-child(3) {
+      animation: wave 20s linear infinite;
+      opacity: 0.3;
+      animation-delay: -2s;
+    }
+    
+    @keyframes wave {
+      0% { transform: translateX(0) translateZ(0) scaleY(1); }
+      50% { transform: translateX(-25%) translateZ(0) scaleY(0.5); }
+      100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+    }
+    
+    @keyframes rotateIn {
+      0% {
+        transform: translateX(100%) rotate(30deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes lampDrop {
+      0% {
+        transform: translateY(-100%) scale(0.2);
+        opacity: 0;
+        filter: hue-rotate(0deg);
+      }
+      50% {
+        transform: translateY(0) scale(1.5);
+        opacity: 1;
+        filter: hue-rotate(180deg);
+      }
+      100% {
+        transform: translateY(0) scale(1);
+        filter: hue-rotate(360deg);
+      }
+    }
+    
+    @keyframes fadeInScale {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .animate-rotate {
+      animation: rotateIn 1.2s ease-out;
+    }
+    
+    .animate-lamp {
+      animation: lampDrop 1.5s ease-out;
+    }
+    
+    .animate-fade {
+      animation: fadeInScale 1s ease-out;
+    }
+    
+    @media (max-width: 768px) {
+      .logo { font-size: 2.5rem; }
+      .subtitle { font-size: 1.1rem; }
+      .capsule-btn { min-width: 140px; padding: 10px 15px; font-size: 0.9rem; }
+      .smart-text { font-size: 1.1rem; }
+      .action-box { padding: 20px; }
+      .btn-group { gap: 10px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-bomb"></i> مین‌یابی - Minerob</h1>
-            <div class="theme-switch" id="themeSwitch">
-                <i class="fas fa-moon theme-icon" id="themeIcon"></i>
-                <span id="themeText">تاریک</span>
-            </div>
+  <div class="snowflakes"></div>
+  
+  <div class="ocean">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+  
+  <div class="header">
+    <div class="logo">Artify</div>
+    <div class="subtitle">test</div>
+  </div>
+  
+  <div class="main-container">
+    <div class="action-box">
+      <div class="radar-container">
+        <div class="radar-sweep"></div>
+        <div class="shooting-star"></div>
+        <div class="circular-effect">
+          <div class="circular-dot"></div>
+          <div class="circular-dot"></div>
+          <div class="circular-dot"></div>
+          <div class="circular-dot"></div>
         </div>
-        
-        <div class="setup-screen" id="setupScreen">
-            <div class="player-inputs">
-                <div class="player-input">
-                    <label for="playerName"><i class="fas fa-user"></i> نام شما:</label>
-                    <input type="text" id="playerName" placeholder="نام بازیکن" value="شما">
-                </div>
-                
-                <div class="player-input">
-                    <label for="aiName"><i class="fas fa-robot"></i> نام حریف:</label>
-                    <input type="text" id="aiName" placeholder="نام حریف" value="هوش مصنوعی">
-                </div>
-            </div>
-            
-            <div class="difficulty-selector">
-                <button class="difficulty-btn easy" data-level="1">
-                    <i class="fas fa-star"></i> آسان
-                </button>
-                <button class="difficulty-btn medium" data-level="2">
-                    <i class="fas fa-star-half-alt"></i> متوسط
-                </button>
-                <button class="difficulty-btn hard" data-level="3">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i> سخت
-                </button>
-            </div>
-        </div>
-        
-        <div class="score-board" style="display: none;" id="scoreBoard">
-            <div class="player-score">
-                <div class="player-name" id="playerNameDisplay">شما</div>
-                <div class="score-value" id="playerScore">0</div>
-            </div>
-            <div class="ai-score">
-                <div class="player-name" id="aiNameDisplay">هوش مصنوعی</div>
-                <div class="score-value" id="aiScore">0</div>
-            </div>
-        </div>
-        
-        <div class="turn-indicator" id="turnIndicator" style="display: none;"></div>
-        
-        <div class="message" id="message">
-            <i class="fas fa-info-circle"></i> لطفا سطح دشواری را انتخاب کنید
-        </div>
-        
-        <div class="game-board" id="gameBoard" style="display: none;"></div>
-        
-        <button class="restart-btn" id="restartBtn" style="display:none;">
-            <i class="fas fa-redo"></i> بازی مجدد
-        </button>
+      </div>
+      <h2 class="action-title">SELECT TOOL</h2>
+      <div class="btn-group">
+        <a href="/ascii-image" class="capsule-btn btn-image">
+          Image to ASCII
+        </a>
+        <a href="/text-art" class="capsule-btn btn-text">
+          Text to ASCII
+        </a>
+        <a href="#" class="capsule-btn btn-ascii-fa">
+          ASCII FA
+        </a>
+        <a href="https://t.me/Red_Rooted_ghost" target="_blank" class="capsule-btn btn-telegram">
+          Join Channel
+        </a>
+      </div>
     </div>
+    
+    <div class="smart-text-box">
+      <div class="smart-text-container">
+        <div class="smart-text welcome-text" id="smartText">
+          Welcome to Artify. Click here to start. 
+          <span class="small-text">@Red_Rooted_ghost</span>
+        </div>
+        <button class="copy-btn" id="copyBtn">
+          COPY
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    &copy; 2025 Artify - Create Unique
+  </div>
 
-    <audio id="mineSound" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-explosion-rumble-2796.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="safeSound" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="winSound" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="loseSound" preload="auto">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sad-game-over-2945.mp3" type="audio/mpeg">
-    </audio>
-
-    <script>
-        const BOARD_SIZE = 56;
-        const MINES_COUNT = 14;
+  <script>
+    const permanentTexts = [
+      "دلم برای لحظه‌هایی تنگ می‌شود که با هم خندیدیم، وقتی که هنوز قلب‌هایمان شکسته نبود.",
+      "هر قطره باران یادآور اشک‌های من است برای عشقی که از دست رفت.",
+      "مثل سیگار نصفه افتادم\nدر جهانی که پمپ بنزین بود…",
+      "این روز ها از کنار من که میگذری احتیاط کن\nهزاران کارگر در من مشغول کارند\nروحیه ام در دست تعویض است!",
+      "دَر حال مَرگ ████████▓99%",
+      "دنیا اونقدر کوچیکه که آدمایی رو که ازشون متنفری هر روز میبینی\nولی اونقدر بزرگه که اونی که دلت می خواد رو هیچوقت نمیبینی …",
+      "یه وقتایی هست\nنه گریه کردن آرومت میکنه نه نفس عمیق\nنه یه لیوان آب سرد نه داد زدن\nﻳﻪ ﻭﻗﺘﺎﻳــــــــي ﻫﺴـــــﺖ ﻛﻪ ﻓﻘﻂ نیاز داری\nبرای همیشه نباشی ﻫﻤﻴﻦ ….!!",
+      "اونے ڪ از همهـ ارومـ تره بدونـ از همهـ داغونـ ترح🖤😔",
+      "عجب تـلـخ بود\nشیرینی دروغ عاشق بودنش …",
+      "Tears are words the heart can't say\nاشک ها کلماتی هستند که قلب نمی تواند بگوید!",
+      "صندوق صدقات نیست دل من\nکه گاهی سکه ای محبت در آن بیندازید\nو پیش خدای دلت فخر بفروشی که مستحقی را شاد کرده ای.",
+      "میخوام جوری بخوابم که برا بیدار شدنم گریه کنین 🙂",
+      "خاطرات آدم مثل یه تیغ کند میمونه که رو رگت میکشی!\nنمیبره اما تا میتونه زخمیت میکنه",
+      "ﺗﻨﻬﺎ کسی که ﺗﻮ ﺯﻧﺪﮔﻴﻢ ﺑﻬﻢ ﭘﺎ ﺩﺍﺩ غم ﺑﻮﺩ\nﺍﻻﻧﻢ ﺗﺮﻳﭙﺖ ﺍﺯﺩﻭﺍﺟﻴﻢ …",
+      "به من گفت برو گورِت رو گم کن …\nو حالا هر روز با گریه به دنبال قبر من می گردد !\nکاش آرام پیش خودت و زیر زبانی می گفتی :\n\"زبانم لال !\"",
+      "یـه حـس بـی حسـی نسبـت بـه هـر حسـی/:",
+      "باران که می بارد\ndلم برایت تنگ تر می شود\nراه می افتم\nبدون چتر، من بغض میکنم، آسمان گریه",
+      "من که به هیچ دردی نمیخورم …\nاین دردها هستند که چپ و راست به من میخورند …",
+      "لــبــخــنــد بـــزن…!\nعـــکــاس مـــدام ايــن جــمـــلــه را تکرار می کــنـــد…\nاصـــلا برایش مهم نیست،کـــه در وجودت…\nحــتـــی یـــک بــهــانــه بــرای لــبــخــنـــد نــیـــســـتــــ…",
+      "مــــــرا کــه هیــچ مقصـــدی بــه نامـــــم ..\nو هیــــچ چشمــــی در انتظــــارمـ نیسـت را ! ببخشیـد !\nکــه بـا بـودنـــمـ تـــــرافیـک کــــــرده امـ !!",
+      "تیغ هست رگ هست جرات هم هست اما خوب مـــــادر هم هست…. (:",
+      "بالاتر از سیاهی هم \"رنگ\" هست …\nمثل رنگ این روزهای من !",
+      "از یه جایی به بعد دیگه بزرگ نمیشی ، پیر میشی\nاز یه جایی به بعد دیگه خسته نمیشی ، می بُری\nاز یه جایی به بعد هم دیگه تکراری نیستی ، زیادی‌ هستی . . .",
+      "اَز‌اینـِکہ‌وَسـط‌خَنـده‌هامِـ‌بُغـض‌کنَـم‌متـنَفرم🖤🕷",
+      "من مرده ام … به نسیم خاطره ای ، گاهی تکانی میخورم … همین",
+      "ای آنکه دوست دارمت اما ندارمت\nبر سینه میفشارمت اما ندارمت\n\nای آسمان من که سراسر ستاره ای\nتا صبح میشمارمت اما ندارمت\n\nدر عالم خیال خودم چون چراغ اشک\nبر دیده می گذارمت اما ندارمت\n\nمی خواهم ای درخت بهشتی، درخت جان\nدر باغ دل بکارمت اما ندارمت\n\nمی خواهم ای شکوفه ترین مثل چتر گل\nبر سر نگاه دارمت اما ندارمت",
+      "I miss you like the sun misses the stars each morning\nدلتنگتم مثل خورشید که هر صبح دلش برای ستاره ها تنگ می شه!",
+      "ما بد نبودیم چون اصلا بلد نبودیم…",
+      "به خـــــــدا\n\" دل \" آلزایمــــــــر نمی گیرد !\nبفهمید آدم ها . . .",
+      "هــر کــس از ایــن دنـیــا چـیـزی بـرمـیـدارد …\nمن امـا فـقـطـ ؛\ndسـتـــ بــرمــیــدارمــ !",
+      "این روزها تلخ می گذرد ، دستم می لرزد از توصیفش\nهمین بس که :\nنفس کشیدنم در این مرگِ تدریجی، مثل خودکشی است\nبا تیغِ کُند",
+      "یه وقتایی دلت میخواد\nیکی از پشت سر چشماتو بگیره و ازت بپرسه :\nاگه گفتی من کی ام ؟\nتو هم دستاشو بگیری و بگی:\nهر کی هستی فقط بمون…",
+      "سرگرمی ام شده گرفتن فال حافظ و من خسته از جواب های تکراری :\n\"غم تمام می شود\"\n\"غصه نخور\"\n\"مشکلات حل می شود \"\nو …\nدلم می گیرد ، چرا حافظ نمی داند بی او هیچ چیز تمامی ندارد جز این زندگی ؟!",
+      "استخوان هایم را به دانشمندان بسپارید …\nشاید بفهمند نه یخبندانی بود نه بیماری مهلکی !\nمن از دوری تو منقرض شدم …",
+      "به ره او چه غم آن را که ز جان می‌گذرد\nکه ز جان در ره آن جان جهان می‌گذرد\n\nاز مقیم حرم کعبه نباشد کمتر\nآنکه گاهی ز در دیر مغان می‌گذرد\n\nنه ز هجران تو غمگین نه ز وصلت شادم\nکه بد و نیک جهان گذران می‌گذرد\n\nدل بیچاره از آن بی‌خبر است ار گاهی\nشکوه از جور تو ما را به زبان می‌گذرد\n\nآه پیران کهن می‌گذرد از افلاک\nهر کجا جلوه آن تازه جوان می‌گذرد\n\nچون ننالم که مرا گریه کنان می‌بیند\nبه ره خویش و ز من خنده‌زنان می‌گذرد",
+      "نگارا، از وصال خود مرا تا کی جدا داری؟\nچو شادم می‌توانی داشت، غمگینم چرا داری؟\n\nچه دلداری؟ که هر لحظه دلم از غم به جان آری\nچه غم خواری؟ که هر ساعت تنم را در بلا داری\n\nبه کام دشمنم داری و گویی: دوست می‌دارم\nچگونه دوستی باشد، که جانم در عنا داری؟\n\nچه دانم؟ تا چه اجر آرم من مسکین بجای تو\nکه گر گردم هلاک از غم من مسکین، روا داری\n\nبکن رحمی که مسکینم، ببخشایم که غمگینم\n\nبمیرم گر چنین، دانم مرا از خود جدا داری\n\nعراقی کیست تا لافد ز عشق تو؟ که در هر کو\nمیان خاک و خون غلتان چو او صد مبتلا داری",
+      "خبرت هست که از خویش خبر نیست مرا\nگذری کن که ز غم راهگذر نیست مرا\n\nگر سرم در سر سودات رود نیست عجب\nسر سودای تو دارم غم سر نیست مرا\n\nز آب دیده که به صد خون دلش پروردم\nهیچ حاصل به جز از خون جگر نیست مرا\n\nبی رخت اشک همی بارم و گل می‌کارم\nغیر از این کار کنون کار دگر نیست مرا\n\nمحنت زلف تو تا یافت ظفر بر دل من\nبر مراد دل خود هیچ ظفر نیست مرا\n\nبر سر زلف تو زانروی ظفر ممکن نیست\nکه تواناییی چون باد سحر نیست مرا\n\nدل پروانه صفت گر چه پر و بال بسوخت\nهمچنان ز آتش عشق تو اثر نیست مرا\n\nغم آن شمع که در سوز چنان بی خبرم\nکه گرم سر ببرند هیچ خبر نیست مرا\n\nتا که آمد رخ زیبات به چشم خسرو\nبر گل و لاله کنون میل نظر نیست مرا",
+      "ما زیاران چشم یاری داشتیم\nخود غلط بود آنچه می پنداشتیم",
+      "زندگیم بودی؛ وقتی سرگرمی ات بودم …",
+      "آخر قصه ی عشق ما را همان اول لو دادند\nهمان جایی که گفتند : یکی بود … یکی نبود …",
+      "من هیچ وقت هیچ چهره ای رو فراموش نمی کنم\nاما در مورد تو …\nخوشحال می شم که استثنا قائل بشم!",
+      "Thanks for breaking my heart\nمرسی که قلبمو شکستی !",
+      "خدایا فکر کنم سرنوشت منو وسط میدون شهر نوشتی ؛\nبس که هرکی به من رسید منو دور زد …",
+      "انتظار\nزیباترین نقاشی دنیاست\nوقتی حاصل تصویرش\nتو باشی …",
+      "خدایا ته نشین شد آرزوهایم ، کمی هم بزن زندگی ام را",
+      "غمگینم، چونان پیرزنی که آخرین سربازی که از جنگ بر میگردد پسرش نیست …",
+      "تکرار مسواک زدن در همه شبها ، دندانها را سفید میکند\nو تکرار خاطرات در همه شبها ،\nموها را",
+      "به خداحافظی تلخ تو سوگند، نشد\nکه تو رفتی و دلم ثانیه‌ ای بند نشد\nبا چراغی همه‌ جا\nگشتم و گشتم در شهر\nهیچکس، هیچکس اینجا به تو مانند نشد",
+      "نفس کشیدن که زندگی کردن نیست!🖤✨",
+      "\" ﺧﻮﺍﺑﯿﺪﯼ؟ \"ﻧﻮﺷﺘﻪ ﻣﯿﺸﻪ\nﻭﻟﯽ \" ﻧﯿﺎﺯ ﺩﺍﺭﻡ ﮐﻪ ﺑﺎﻫﺎﺕ ﺣﺮﻑ ﺑﺰﻧﻢ \" ﺧﻮﻧﺪﻩ ﻣﯿﺸﻪ …",
+      "زندگی چون قفسی است ، قفسی تنگ ، پر از تنهایی",
+      "چقدر عبرت در این عروسک هاست، و ما از عروسک کمتریم …\nآن ها مرده بودند و زندگی می کردند، ما زندگی می کنیم و مرده ایم …",
+      "ما دو پیراهن بودیم\nبر یک بند… یکی را باد برد\nدیگری را باران هر روز\nخیس میکند……",
+      "دلم شکسته ست و\nهیچکس دردم را نمی داند\nآه از این غم که با من\nمی سوزد و می سازد",
+      "سرد که باشی دلسرد میشوی از آدمها حتی از خودت سرد که باشی کلافه میشوی از تمام این درد های سرد",
+      "زندگی ، ساعتی شنی ست\nگاه لازم است زیر و رو شود !",
+      "تو را مثل قانون…\nکسی رعایت نمی کند؛\nچرا غمگینی دلم؟\nتو را برای شکستن سرشته اند…!",
+      "پسر بودن همیشه به معنای قوی بودن نیست. پشت شانه‌های پهن، نگاه‌های سرد و سکوت‌های کش‌دار، گاهی دلی پنهان شده که از درون شکسته است. پسرها همیشه یاد گرفته‌اند که گریه نکنند، درد را قورت دهند و لبخند بزنند، حتی وقتی دنیا روی شانه‌شان سنگینی می‌کند.",
+      "من به غمگین ترین حالت ممکن شادم!\nتو به آشوب دلم ثانیه ای فکر نکن …",
+      "و‌َهیِچکَس‌نَخوآهَد‌فَهمیِد‌چِه‌گُذشِت‌تآ‌گُذَشِت…!!",
+      "جوانی ما\nحکایت یخ فروشی است که از او پرسیدند، فروختی؟\nگفت نه ولی تمام شد.",
+      "اَز‌آرزِوهامُون‌فَقَط‌فِکرُو‌خیال‌مُوندِه🖤`",
+      "《\"نه عشق اجازه داد زندگی کنیم؛\nن زندگی اجازه داد عشق کنیم\"》🤌🏻🖤",
+      "همه ی ما در وجودمان ترک هایی داریم\nاینگونه است\nکه نور به درونمان میتابد",
+      "شکسته تر از شیشه بی حس تر از سنگ",
+      "همیشه اخرش خب تنهاییه\nهیکچس تو نمیشه برام دیگه:)️",
+      "خسته ام از اینهمه خواستن هایی که داشتن نمی شوند",
+      "بیـخیالِ آرِزو هـا، هیـچـے قِسمَتِ ما نَبود!",
+      "با بالِ شِکَسته پَرکِشیدَن هُنَر است!",
+      "‌جسمی ساکت،ذهنی پر از هیاهو…!",
+      "پر از اشکم ولی میخندم به سختی\nبه قول فروغ که میگفت:\nشهامت میخواهد سردباشی و گرم بخندی!",
+      "زندگیه هر آدمی عین کتاب می مونه ولی فقط خدا می دونه کتاب من چقد پر از غمو غصه هست🙂🖤️",
+      "پُشتِهر‌ساکِت‌شُدنی؛یه‌قَلبی‌که‌شِکسته‌خوابیده🖤🕯",
+      "کاش نبودم 🙂\nشاید همه چی بهتر بود 💔\nشکسته که باشی\nساده ترین حرف ها\nاشکت را در می آورند..",
+      "تبدیل به #نفرت میشه #بهترین حس\nزندگی همینه:)♡️",
+      "انـدڪے جـۅانـے داۺـٺـیم…..\nدر غـم و حـسـرٺ ڱـذشـٺ.. 🕊🖤",
+      "من واست ی تجربه بودم،\nتو واسم ی خاطره شدی…!️",
+      "تو با لیوان شکسته بازی نمیکنی ولی با قلب شکسته چرا️",
+      "' چِه‌ذوق‌هایی‌کِه‌ذوق‌مَرگ‌شُدَند‼️🖤..\n'وَ‌چِه‌نِگاه‌هآیی‌کِه‌خاطِرِه‌شُدَند!",
+      "دَر‌هَیاهوی‌ِجَهان‌دَر‌خَلوَت‌ِخود‌گُمشُدِه‌اَم..🖤🚷 ️",
+      "به من مداد سیاه دادن\nو گفتن زندگیتو رنگی بکش🗿🕸️",
+      "غم و شادی انسان ها را می توان از چشمانشان فهمید،\nنگاه را نمی توان آرایش کرد.\nکاترین پانکول ️",
+      "اگر ذوقی هم بود دیگر تمام شد💔",
+      "هیچکس به اشکات توجه نمیکنه ،\nهیچکس به ناراحتیات توجه نمیکنه ،\nهیچکس به دردی که میکشی توجه نمیکنه…..\nولی همه……به اشتباهاتت توجه میکنن",
+      "تنهاییت را بچسب ، بیخیال آدمها\nوابستگی فقط درد دارد .",
+      "شده دلتنگ شوی چاره نیابی جز اشک! من به این چاره بی چاره دچارم هر شب..",
+      "زخم ها \"مثل قهوه ☕می مونن؛هر چه زمان بگذره سرد میشن ولی تلخی خود را از دست نمیدن.)**",
+      "دلخوریام دونه دونه جمع شد تبدیل شد به سکوت…..",
+      "دلشکستِـه که باشیٓ،\nساده ترین حَرفا اشکتُ دَر میاره..\nدلشکستِگی پیچیده نیٓس !!\nیِه دلـِه یِه آسمونه،\nیه بُغضِـه با آرزو های ترک خوردِه..\nبه همین سادِگی !!\nحالَـم خوبه،\nامـا دلَم تنگـِه برا خنده هامون:}\nدلشِکستگی هامُ زیر دوش حَموم میبرَمُ،\nبغضامُ زیر شرشر آب داغ میترکونـَم:))\nتا همه فکر کُنـن؛\nقرمزی چشمام از دَم کردن حمومِه !!\nدل شکستگی دَرد داره لعنـتی،\nمَعنا نداره 🙂",
+      "چه حرف بی ربطیست که مرد گریه نمی کند\nگاهی آنقدر بغض داری که فقط باید مرد باشی تا بتوانی گریه کنی…",
+      "‌ نیاز دارم به شبی ک فردایی نداشته باشه:)🪦🖤🚬 ‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌‌️",
+      "نه حسی واسه امروز.. نه حالی واسه فردا.. ️",
+      "اَگربآل‌وَ‌پَری‌هَم‌بآشَد،دِگَرشُوقِ‌پَروآز‌نیست🖤 ️️",
+      "‏مشکلم این نیست که امروز، فردا یا یه ماه دیگه بمیرم، من مشکلم اینه زندگی نکردم",
+      "اَز قَلب گُذَشتِه….\nمَن روحَم دَرد میکُنِه…!️",
+      "تقــویمِ امـسال هـــم..\n\nبـا تقـــویــمِ پــارسال..\n\nهیـــچ فــرقـی نمیـــکند..\n\nوقتـی..\n\nزنـــدگی..\n\nتــا اطّـلاعِ ثــانــوی ..\n\nتعــطــــــیل اسـت !",
+      "واقعا خیلی سخته\ndلت گیرکنه به قلاب ماهیگیری که دلش ماهی نمیخواهد\n\nو فقط برای تفریح اومده ماهیگیری",
+      "خـــــــــــــــــواهـــش میکـــــــــــنــــــــــــم…!!\nاز پیـــش او نــــــــــــــــرو\nهــــــــــیچـــــــــــــــــکـــــــــــــــــــــس\nطـــاقـــتــــی کــــه مـــــــــن داشـــــــــتـــــــــــــم را\nنــــــــــــــــــــــــــدارد…",
+      "دیوانه ها با خودشان حرف نمی زنند!\n\nآن ها فقط تمام روز را به کسی که نیست، بلند بلند فکر می کنند…",
+      "به حرمت نان و نمکی که با هم خوردیم\n\nنان را تو ببر که راهت بلند است و طاقتت کوتاه!\n\nنمک را بگذار برای من میخواهم این زخم همیشه تازه بماند",
+      "خسته ام مثل درخت سروی که سال ها در برابر طوفان ایستاد\nو روزی که به نسیمی دل داد ، شکست …",
+      "– تنهایی\n\n+منظورت از تنهایی چیه؟\n\n-یعنی کسی تو زندگیت است یا تنهایی؟\n\n+کسی تو زندگیم هست ولی تنهام…",
+      "مسافر بی بدرقه من\nآنقدر بیصدا رفتی که از وداع جا ماندم\nباز به غیرت چشمانم\nکه آبی پشت سرت ریختند…",
+      "می گویند : خوش به حالت!\n\nاز وقتی که رفته حتی خم به ابرو نیاوردی…!\n\nنمی دانند بعضی دردها کمر خم می کنند، نه ابرو",
+      "معنی ماندن ِ بی عزت چیست؟\nقبل از آنکه آبروریزی شود\nخدایا، خودت تمامش کن…",
+      "می‌گفتند: سختی‌ها نمک زندگی است\nاما چرا کسی نفهمید نمک برای من که خاطراتم زخم است\nشور نیست\nمزه درد می‌دهد",
+      "قلبی خاکی داشتم ، آدما خیسش کردند\nگِل شد ، بازی کردند ، خشک شد ، خسته شدند\nزدند شکستند ، خاک شد ، پا رویش گذاشتند ، رد شدند…",
+      "گفتم: تمام وجودم از آنِ تو بود. مشکلت چه بود که با من چنین کردی و چنین آسان قلبم را شکستی؟\nگفت: آنقدر خوبی که حالم را بهم می‌زنی",
+      "صدایت همچو آواز قناریست / بگو بی تو چگونه میتوان زیست ؟",
+      "نه هوا سرد نیست…\n\nسرمای کلامت دیوانه ام میکند…\n\nبی رحــــم! شوق نگاهم را ندیدی؟\n\nتمام من به شوق دیدنت پر میکشید…\n\nولی همان نگاه بی تفاوتت\n\nبرای زمین گیر شدنم کافی بـــــــــــــود",
+      "اگر گریــه نمیکنـــم فکــر نکن از سنگـــــم !\nمــن مـــــرد هستم …\nتنهـاییــ قـدم زدنم از گریـه کردنـ دردنـاکــــ تـــر استـــ",
+      "دِلتنگی فقط اونجاش بَدِه که\n\nyِهو به خودِت میای میبینی\n\nتوو خیالِت داری\n\nباهاش حَرف میزنی …\n\nولی خُب حِیف !!\n\nحِیف که بِقول شَهریار :\n\n\"خیالَت ساده دِل تَر بود و با ما از تو یِک رو تَر\"",
+      "آغوش هیچ خیالی بوی آشنای بازوانت را نداشت\n\nو نجوای هیچ بارانی همصدای لب های تو نبود\n\nاینک تو را بی خیال و بی باران\n\nکجای این شب حسرت جستجو کنم ؟\n\nشب هر چقدر هم\n\nکه سیاه باشد\n\nتنهایی ام را نمی پوشاند.\n\nدلتنگی\n\nاز گوشه هایش بیرون می زند.",
+      "فقط رفت بدون نگاهی که رنگ حسرت داشته باشد\n\nفقط رفت و من شنیدم آرام گفت : آخیش راحت شدم!",
+      "کاش می شد….\n\nyه آگهی تجاری هم بود این شکلی…\n\nدل گرفته تان را …\n\nبه بالاترین قیمت خریداریم..\n\nشانه می دهیم …\n\nسر بگذارید …\n\nدرد و دل کنید\n\nو نترسید از بعد !\n\nبعد از درد و دل هم ،\n\nنخود نخود هر که رود خانه ی خود…\n\nنه دلی جا می موند …\n\nو نه احساسی خَش می افتاد….",
+      "هــر کــس از ایــن دنـیــا چـیـزی بـرمـیـدارد …\nمن امـا فـقـطـ ؛\ndسـتـــ بــرمــیــدارمــ !",
+      "سخته از بغض گلو درد داشتن\n\nسخته از گریه یه جفت چشم همیشه تر داشتن\n\nسخته تو حسرت یک نگاه موندن\n\nسخته عشق یک طرفه داشتن",
+      "یــک روزی ..\nبـه هـــر دلـــیلی ..\nاگــر از تــه ِ قــلب ِتـــان خــندیــدیــد ..\nلطـــفـا”,\nبـــرای ِ من هـــم تـــعریــف کنـــید !",
+      "خجالت کشیدم بگویم: گند زدی به تمام باورهایم\nغرورم نگذاشت بگویم: نرو! بمان کنار دلم\nدلم نمی‌گذارد فراموشش کنم\nعقلم نمی‌گذارد بگویم: برگرد\nخاطراتش نمی‌گذارد نفس بکشم\nقسمت نمی‌گذارد دست‌هایم به رؤیای داشتنش برسد\nو این وسط خدا با تمام بزرگی‌اش فقط نگاه می‌کند",
+      "وفای شمع را نازم كه بعد از سوختن\nبه صد خاكستری در دامن پروانه میریزد\nنه چون انسان كه بعد از رفتن همدم\nگل عشقش درون دامن بیگانه میریزد…",
+      "هنوز نیامده ای خداحافظ؟\n\nتقصیر تو نیست\n\nهمیشه همین گونه بوده\n\nبرو اما من پشت سرت دست نه ، دل تکان می دهم",
+      "مــــــرا کــه هیــچ مقصـــدی بــه نامـــــم ..\nو هیــــچ چشمــــی در انتظــــارمـ نیسـت را ! ببخشیـد !\nکــه بـا بـودنـــمـ تـــــرافیـک کــــــرده امـ !!",
+      "اس ام اس غمگین خیانت\nاین روزها جواب صداقت را با دروغ میدهند !\n\nجواب محبت را با بی محبتی می دهند !\n\nجواب با وفایی را با بی وفایی !\n\nو جواب دوستی را با دشمنی !\n\nچه خوب آرایه \"تضاد\" را به کار می برند",
+      "‌تو‌هَمونی‌بآش‌کهِ‌مَن‌میخآم‌بَقیَش‌بآ‌من😉🤍",
+      "خیلی‌چیزآرو‌زَمآن‌ثآبِت‌میکنه؛😉🙌🏽",
+      "هی‌بِگو‌مَهِم‌نیس‌بَعد‌بِزَن‌زیرِ‌گِریه؛👐🏾💔",
+      "زَخم‌زَدی‌رَفتی‌زَخم‌میخوری‌بَرمیگَردی؛🖤",
+      "مُهِم‌اینِه‌خُدا‌فَراموشِت‌نَکُنِه‌بَقیهِ‌کِه‌میان‌و‌میرَن📿🌿",
+      "حضور ما باعث فشار خیلاست✌🏻..)",
+      "چ‌‌غرور‌هایی‌برایی‌تو‌لح‌کردم:)🖤👋🏾",
+      "از قولآت‌موند‌واسم‌دوتا‌شات 🖤.",
+      "یدونه‌واقـعی‌کافـیه❤️🪬؛",
+      "𝑇𝒉𝑖𝑠 𝑇𝑜𝑜 𝑆𝒉𝑎𝑙𝑙 𝑃𝑎𝑠𝑠\n\nاین نیز بگذرد ! 🧿",
+      "ما کَم سِن و سآل تَرین سآلمَندان تآریخیم . !❤️‍🩹",
+      "‌بِمآنَدکہ‌دࢦتنگےهَم‌عـآلَمےداࢪد 🖤:",
+      "در حد ما بودن در حد شما نیست!🐉🐲🐾",
+      "آنکه را ارزش دهی هاری نگیرد آرزوست🫵🏻😉",
+      "وَ مَرگی کِه بِه شِدَت آرِزوست❤️‍🩹",
+      "‌زیرِسایه‌مابودَن‌لیاقَت‌میخواد...♱㊗️🔱 ‌️",
+      "حآل  𝙢𝙖𝙣 اَز دَرک شمآ گذَشته🖤",
+      "زَمین‌گِردِه‌و‌کآرما‌هَم‌کآر‌بَلَد...🥀🖤",
+      "دِلِت‌کِه‌تَنگ‌شُد‌مِیفَهمِی‌کِیو‌𝗕𝗔𝗞𝗛𝗧𝗶\"💸",
+      "قلبم‌سردخانه‌ایست؛پرازآشنا🖤🕊",
+      "کافیه یه اشتباه کنی\nکم عقل ترین آدمای شهر واسه نصیحت کردنت صف میبندن:",
+      "_کارما‌بلده‌در‌‌خونه‌همتونو❕♻️",
+      "تو از ما بد‌نگو ما خودمون به همه میگیم از ما بهتری",
+      "و عِـشـقـي‌کـهِ؛حَـسـرَت‌شُـد；💔",
+      "𝘌𝘴𝘩𝘵𝘢𝘉𝘢𝘩 𝘬𝘢𝘙𝘥𝘢𝘔 𝘕𝘢𝘉𝘶𝘥𝘪 𝘒𝘰𝘕𝘢𝘙𝘢𝘔😴🦈\nاِشتباه‌کردَم‌نبودی‌کِنارم😴🦈",
+      "‌مُدَتیست حیرانم و تدبیری نیست.\n\nهَنو یاد تو میفتم سنگین میشه پلکَم ;",
+      "‌کاش‌میبردی‌باخودت‌خاطره‌هاتو🖤!!",
+      "بی‌وفا‌بمانید‌!\nهمانایی‌که‌میگفتند؛وفادارند‌بی‌وفایی‌را‌مُد‌کردند",
+      "خٰاطِرهآي‌خُوبِشَم؛بوُي‌حَسرَت‌میده🦋🪫>",
+      "#اقای‌قاضی..!\nج‍‌ال‍‌ب‍‌ه ازب‍‌زرگ ش‍‌دن #م‍ت‍‌ن‍‌ف‍‌ری‍‌م ول‍‌ی ت‍‌ول‍‌دم‍‌ون‍‌وج‍‌ش‍‌ن م‍‌ی‍‌گ‍‌ی‍‌ری‍‌م .!😞",
+      "زده مـ‌یـ‌شـ‌ی حـ‌تـ‌ی از نـ‌زدیـ‌ک تـ‌ریـ‌نـ‌ت-!🫧🖤",
+      "مـ‌ورفـ‌یـ‌نـ‌مـ‌ی وقـ‌تـ‌ی کہ مـ‌یـ‌شـ‌م عـ‌صـ‌بـ‌ی-!🫧🖤",
+      "هـ‌رطـ‌ور بـ‌اشـ‌ی ، هـ‌مـ‌ونـ‌ بـ‌اهـ‌ات-!🫧🖤",
+      "هـ‌مـہ چـ‌ی‌ داشـ‌ت،جـ‌ز لـ‌یـ‌اقـ‌ت-!🫧🖤",
+      "‌\nواسهاعتمادایالکیدادیمتاوانایسخت؛🖤...",
+      "بٰاکَسی‌نِمیکُنَم‌اُون‌پِسَرُ‌𝘈𝘝𝘢𝘻•🩷🧬`",
+      "فازتون آدیداس لباس تنتون باب اسفنجی🤣💋",
+      "<خوَِب‌بوَِدن‌زیَِادی‌تاوَِان‌دارَِه🩵🦋",
+      "کَنسلیت‌خُورد‌چُون‌بودِی‌عمومِی🪽🚷",
+      "⌝ࡎࡅ࡛ߺܝ‌ܦ߳ܥ‌ܝ‌ࡅߺ߳ࡉ‌ࡅ࡛ܝ࠭‌ܝ‌ࡏަࡅ࡙ܘ🥃⌜",
+      "سکوت از دآد پخته تره: 💤🖤",
+      "کشتی مخم غرق فکره؛\"🕊⚡",
+      "اَگهِ‌تواُوجِ‌فَرٰاموشی‌بِبینَمِت‌چی-🕊❤️‍🩹-",
+      "اُونی‌کهِ‌دِلِش‌مُردهِ؛اَز‌مَرگ‌نمیتَرسهِ,🎭🖤,",
+      "وَقتی‌شیشه‌عطری‌رو‌بِشکنی‌قَوی‌تَرین\n           بوروبِهت‌میدهامّابرای‌اخرین‌بار؛😉🖐🏼",
+      "میِزَنم‌زیرِ‌میزِی‌کهِ‌شَرطِش‌بٰاختِت‌بٰاشهِ°🫁😉🖖🏼°",
+      "صحنه ها تکرار میشن نقش ها جابجا-😉👋🏽-",
+      "بوجـور قالمـاز دولانـار🎡🕊؛",
+      "هیچوقت‌یادم‌نمیره؛کی‌کجا‌جا‌زد-🕊💯-",
+      "برداشتِ شُما منظورِ ما نیست؛'😉🖐🏽",
+      "یٰادِتیم گَرچهِ یٰادِ مٰا نیسِتی;🪽🎭",
+      "‌بَعدِمَن‌هَرچی‌تَجرُبِه‌کُنی‌بَرات‌تِکراریِه,,😉🖐🏽,,",
+      "رَفتیمونَرفتیم،اَزیادِهَم🪽🕊",
+      "قدرِ‌همو‌بِدونیدتا‌حالا‌هیچ‌\n        سنگ‌ِقبری‌جواب‌کسیو‌نداده،🕊💔،",
+      "‌این جاده خاکیام یروز بزرگ راه میشن'❤️‍🔥🪬'",
+      "اُونی‌‌کهِ‌اِسمِش‌اَز‌دَهَنَم‌‌نِمی‌اُفتٰاد‌اَزچِشٰام‌اُفتٰاد🎭🦈",
+      "حسود\"غریبه\"نیست؛؛😉🖐🏾",
+      "اگه جسم مهم بود خدا جسم\n          را میگرفت نه روح را🕊🖐🏽؛",
+      "-حیف‌بود‌توعم‌بشی‌مثل‌بقیه🖤😅🫵🏽",
+      "تنها راه درمانم مرگ هست 🙂💔",
+      "داغـ‌ۅن‌ کـ‌ردۍ دخـ‌تـ‌رتـ‌و-!🫧🖤",
+      "تـ‌لـ‌خـ‌ی‌ پـ‌یـ‌ک‌ هـ‌ایـ‌م‌ تـ‌اوان‌\nاݛزوهـ‌ای شـ‌یـ‌ریـ‌نـ‌م‌ بـ‌ود-!🫧🖤",
+      "آدم‌هـ‌ا از آدم بـ‌ودن خـ‌سـ‌تہ‌ات مـ‌ی‌کـ‌نـ‌نـ‌د-!🫧🖤",
+      "تـ‌ا‌ اسـ‌تـ‌خـ‌ۅان‌ مـ‌بـ‌‌تـ‌لا بہ دݛد-!🫧🖤",
+      "تـ‌ک‌ سـ‌تـ‌اره‌ام‌ رفـ‌ت،مـ‌اهـ‌ت‌ بـ‌مـ‌یـ‌رد‌ آسـ‌مـ‌ان-!🫧🖤",
+      "‌نـ‌مـ‌یـ‌کـ‌شـ‌م مـ‌نـ‌تِ بـ‌ودن کـ‌سـ‌یـ‌و-!🫧🖤",
+      "کؙـلـؚیحـؘرفؚدؚارؘمپـؙشـؚتسؙـکوتـؘم👋🏽🖤-!",
+      "\"ب‍‌ه ع‍‌ش‍‌ق اع‍‌ت‍‌م‍‌اد ن‍‌ک‍‌ن💔🫧👼🏿!",
+      "دردِلَم‌مِیمآنِی‌تا‌قیامَتِ🫵🏼💋!'",
+      "وفایش‌داستان‌داشت`🤍🫦",
+      "وَامآن‌از‌فکرایی‌ک‌همش‌تویی🖤🕊",
+      "-روحِ‌روزآی‌سـختمی🪽🤍-",
+      "در‌کوچه‌های‌بی‌کسی‌تو‌تنها‌یار‌منی؛\nای‌ناز‌تر‌از‌خواب‌شبم‌آیا‌توهم‌یاد‌منی.🖤",
+      "خوش‌باشی‌باهاش‌‌عشقِ‌اشتراکی؛؛\"😉🖐🏾",
+      "واسَم‌یِه‌دُنیا‌بودی‌فُلانی-🕊💔-",
+      "کسی‌را‌یافتم‌که‌روحم‌او‌را‌دوست‌دارد.🪽🖤",
+      "نَدیدم‌قَشنَگتَر‌اَز‌چِشات👧🏻🤍👀°",
+      "هَمهِ‌‌اَز‌غَریبهِ‌خُوردَن،‌ما‌اَز‌خُودِی‌؛\"🦈🖤",
+      "زودتَراَز,اینکه‌ِعَجَلِت‌بیٰاد,بَرٰام مُردی；\"😴🖐🏽",
+      "عِـشـقـي‌کـهِ؛تـآوان‌شُـد；💤👼🏽",
+      "•خـُوشـبــَخـتـی لـآیـقِ ..\nبــَدبــخـتـِی کـشـِیـده هـآسـِت'✌🏼⚡️'",
+      "هیچکَسَم‌نخواد‌؛اون‌بالایِی‌بِخواد‌بَسهِ🪬❤️‍🔥؛",
+      "-کَسِی‌اَز‌مآمُتنفر‌نِمیشهِ‌چُون‌مآ‌صآدِقآنهِ‌بَدیِم；🖤",
+      "-آرزو‌هآیم‌رآ‌قربانی‌خآطرآتم‌کردم🖤🪬👋🏽.",
+      "می‌شد‌آخر‌قصه‌مون‌قشنگ‌بشه؛نموندی❤️‍🩹🕊",
+      "زَخم‌بِه‌زَخم‌خُودَمُوساختَم'🪬🐉'",
+      "-دردای‌امروز؛درسآی‌فرداست👋🏼🖤🕊",
+      "-آرِزوِ‌بآ‌شِ‌‌نَه‌خآطِرِهِ.!😉🧿👌🏾",
+      "مَثَلَاً مامانَم بِگِه بِه روحِ دُختَرَم:) 🖤",
+      "اݛزش آدمـ‌ا دسـ‌ت خـ‌ودشـ‌ونہ-!🫧🖤",
+      "مـ‌ا حـ‌الـ‌مـ‌ون خـ‌رابہ یـ‌سـ‌ریـ‌ا مـ‌ادرشـ‌ون-!🫧🖤",
+      "چـشـ‌‌م رو هـ‌م بـ‌زاری دورتـ‌و خـ‌الـ‌ی کـ‌ردن-!🫧🖤",
+      "جـ‌دیـ‌دارو دیـ‌دی نـ‌زن قـ‌یـ‌د قـ‌دیـ‌مـ‌یـ‌ا رو-!🫧🖤",
+      "کـ‌اش‌مـ‌یـ‌بـ‌ردۍبـ‌اخـ‌ودت‌خـ‌اطـ‌ره‌هـ‌اتـ‌و🖤🫀",
+      "خـ‌ودی هـ‌ا از هـ‌مہ دشـ‌مـ‌ن تـ‌رن-!🫧🖤",
+      "گـ‌م‌ کـ‌ردم‌ خـ‌ودمـ‌و‌ تـ‌و‌ غـ‌مـ‌ام-!🫧🖤",
+      "غـ‌رق شـد‌یـ‌م بـ‌یـ‌ن یہ مـ‌شـ‌ت رویـ‌ا-!🫧🖤",
+      "چـ‌ویـ‌لـ‌م‌ هـ‌ر‌ شـ‌و‌ گـ‌ریـ‌انہ-!🫧🖤",
+      "تَصوراتِ‌باطِل‌نَقش‌زَد‌آیَنده‌مارا..!🖤🦋",
+      "ناگَهان‌هَمه‌چیز؛ هیچ‌میشوَد..!🖤🦋‌",
+      "آدَم‌هاروآدَما‌دیوانه‌میکُنَند..🖤✨",
+      "اِعتِمادکَردَن‌ریسکِش‌اَزخودکُشی‌بیشتَره..😉👋🏻",
+      "برای‌خودت‌زندگی‌کن🪬🐬",
+      "آسِمون‌مال‌ما‌بود؛ یادِته？:)🖤🦋",
+      "کافیه‌خود‌واقعیتوپیداکنی‌‌😉👊🏿",
+      "زندگی‌‌نوشته‌ای‌‌زیبا‌است‌برای‌فردی‌نابینا🖤🕊",
+      "همچنان‌به‌این‌داستان‌ادامه‌خواهم‌داد🖤🐬",
+      "انتهای‌‌جنگل‌قلبم‌هنور‌درخت‌‌‌سبزم‌هستی💯🖤",
+      "دیگِ‌حِسی‌نَدارَم‌مَن‌بِ‌حَرفآت\"🖤",
+      "اَصلانِفرَت‌دارَم‌اَزکِسایی‌کِ‌بَدمیگَن‌اَزَت\"🖤",
+      "تُ‌نیستیُ‌مَن‌هَنوزعاشِقِتَم\"🖤",
+      "مَن‌هَمه‌خودَمو‌گُذاشتَم‌بَراش\"🖤",
+      "ضَربِه‌ای‌کِ‌اِعتِمادمیزَنه‌دراگ‌نِمیزَنه؛🖤🫴🏻",
+      "مِیِگِذَرِه‌تَا‌بِفَهِمِی‌کَسِی‌مَنِ‌نِمِیِشِه‌بِرآطُ🖤🌚",
+      "گُم‌شدم‌تو‌عمق‌چشآش🪬🖤",
+      "پیر‌شُد‌این‌دُختَربَعد‌ِتو👼🏻💔؛",
+      "گُذَشتِه‌هاگُذَشت‌ماهَم‌میگذَریم\"🖤🦋",
+      "جا‌نَدارَم‌واسِه‌زَخم‌جَدید\"🖤🫴🏻",
+      "وفادارۍ سخت نیست تو بزࢪگ نشدۍ🖤-",
+      "تڪیہ ڪࢪدم بہ خودم چون دیگࢪان رهگذࢪن🖤-",
+      "نـمیگیࢪه‌جاتۅهیچڪے💚🪵!",
+      "-این‌𝒑𝒆𝒔𝒂𝒓دلیل‌خوشحالی‌منه!👼🏻🤍",
+      "خوبیتۅ میݛه از یادشۅن🖤-",
+      "ذهنۍ خستہ🖤-",
+      "اعتماد اشتباه نڪنید🖤-",
+      "﮼‌‌آرامـِ جــان مــن تويی💜⭒.",
+      "من‌آرزوت‌کردم‌حسرتشو‌خوردم\nیکی‌دیگه‌هوست‌کرد‌لذتشوبرد🖤'",
+      "وفا ز هیچ‌ مجۅ، هࢪچہ هست دࢪ گذر است🖤-",
+      "و شب ، سࢪآغاز تمامِ دلتنگۍ هاست🖤-",
+      "خفتہ است‌ دࢪ تنم؛ همہ ࢪگ‌هاۍ آࢪزو🖤-",
+      "خدایۍ ڪہ تو ࢪا ببخشہ خداۍ من نیست🖤-",
+      "چَندبآࢪ‌دَࢪ‌مَغزَم‌ٹوࢪ‌اڪشٹَم‌؛\nوَلے‌‌هَنوزدَࢪ‌قَلبَم‌نَفَس‌میڪِشے‌!°🖤🪬°",
+      "•وَلے‌ٹو‌هیچوَقٹ‌فَࢪ‌امـوش‌نِمیـشَوے‌؛\nیادَٹ‌‌دࢪ‌اسـٹخوان‌‌هـآے‌‌مَـن‌اسـٹ‌•🖤🪬",
+      "ٹماشا‌گࢪ‌ٹ‌خواهَم‌بُود‌؛\nزَمانے‌ڪہ‌ٹاوان‌ِهَمِـہ‌چیز‌ࢪ‌ا‌میدَهے‌!°🖤🪬°",
+      "چِـہ‌نَقاشے‌مآهِࢪ‌یسٹ‌فِڪࢪ‌و‌خیالَٹ‌؛\nٹمآمِ‌مُوهآیَم‌ࢪ‌ا‌سِفید‌ڪࢪ‌د!°🖤🪬°",
+      "دنـ‌یـ‌ام‌خـ‌لـ‌اصـہ‌چـ‌شـ‌مـ‌ایِ‌تـ‌وعـہ🤎⚡️",
+      "طُ‌‌تـ‌نـ‌هـ‌ادلـ‌یـ‌ل‌اکـ‌لـ‌یـ‌لـ‌ی‌شـ‌دن‌قـ‌لـ‌بـ‌مـ‌ی💕🐈‍⬛(:",
+      "غـ‌رور زیـ‌بـ‌آس حـ‌یـ‌فـ‌ه‍‌ نـ‌داریـ‌ن-!🫧🦕",
+      "هـ‌میـ‌ن ڪہ مـ‌نـ‌ۅ نـ‌دارۍ خۅدش ڪاݛمـ‌اس-!🫧🦕",
+      "زخـ‌م دوݛیـ‌ت عـ‌مـیـ‌قہ-! 🫧🦕",
+      "نـ‌داݛه هـ‌یـ‌چـ‌ڪس اَݛزِش اَشـ‌ڪاتـ‌و-!🫧🦕",
+      "بـ‌یـ‌خـ‌ال‌ تـ‌ر‌ از‌ هـ‌ر‌ خـ‌یـ‌الـ‌ی-!🫧🖤",
+      "تـ‌نـ‌هـ‌ایـ‌ی حـ‌رف‌و‌ حـ‌دیـ‌ث نـ‌دارد-!🫧🖤",
+      "هـ‌مـ‌یـ‌شـ‌گـ‌ی‌ بـ‌ودنـ‌اتـ‌ون‌ فـ‌قـ‌ط‌ یہ تـ‌کـ‌سِ-!🫧🖤",
+      "شـ‌یـ‌طـ‌آن هـ‌ایـ‌ی بـ‌نـ‌آم رفـ‌یـ‌ق-!🫧🖤",
+      "هـ‌رگـ‌زنـ‌بـ‌ود...🖤🚬\nهـ‌رآنـ‌چہ‌هـ‌رکـ‌س‌مـ‌یـ‌گـ‌فـ‌ت；",
+      "تـ‌و شـ‌مـ‌ع دل تـ‌اریـ‌ک‌ مَـ‌نـ‌ی💕🐈‍⬛(:",
+      "بـ‌رای هـ‌دفـ‌ت بـ‌جـ‌نـ‌گ-!🫧☘️",
+      "رفتی‌و‌الان‌یه‌سال‌شد‌‌نیستی🦋🚶🏿‍♂",
+      "تواَم‌شُدي‌مِثِ‌اونآ:)🦋💔",
+      "گذشت‌روزهایی‌که‌برای‌دیدن‌تو‌میمردم😂✋🏿",
+      "و‌چه‌بی‌ذوق‌،جهانی‌که‌بی‌تو‌گذشت!🩶🐬",
+      "همیشه‌آخرین‌بارها؛ناگهان‌اند!🖤👋🏿",
+      "ماندن‌همیشه‌خوب‌نیست🖤💯",
+      "\"تنها‌خاطرات‌است‌که‌می‌ماند\"!👊🏿🐬",
+      "تنها‌دلیل‌زندگی‌این‌دختری❤️‍🩹🦋",
+      "عجیب دل بستیم به کسی که دل نداشت🖤🚷",
+      "' اقای قاضی همه‌ی ما از یه جایی به بعد دیگه اون آدم سابق نشدیم💔🧷'️",
+      "ریہ‌‌هام‌داره‌تقاص‌اشتباهات‌قَلبمو‌پس‌میده💔🪽!",
+      "بزرگ‌شدیم‌طُ‌بی‌عدالتی💔🪽!",
+      "خاطره‌نسازید‌فراموش‌کردن‌سخته💔🪽!",
+      "ازاشک‌چشآم‌ساختم‌یه‌قایق💔🪽!",
+      "صبࢪ قدࢪت منہ🖤-",
+      "اما لبخند زدن نشونہ‌ۍ خوشحال بۅدن نیست🖤-",
+      "نجنگ‌ وقتۍ اۅلویتش‌ نیستۍ🖤-",
+      "⁪⁬⁮⁪⁬⁮⁪⁬⁮⁮⁪⁪⁬⁮⁮⁪⁪⁬⁮⁮⁪⁪⁬⁮⁮⁪⁪⁬ساختیم ࢪویا تو هَپـࢪوت🖤-",
+      "آدماࢪو از خوب بودن خستہ نڪنید🖤-",
+      "بۍتفاوتۍ یہ انتقام خیلۍ شیڪہ🖤-",
+      "شاید‌من‌بلد‌نبودم‌نگهت‌دارم‌\n‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌  ‌اما‌خودتم‌موندنی‌نبودی🖤.",
+      "تٰـاوانِ‌هـیـچـي‌قَـشَـنـگ‌نـیـسـتِ；\"🐉",
+      "پآیِ هَرچی وآیسادم شُدم شَرمندِه پآهام🖤🐾'",
+      "#زی‍‌ادَن_آدَم‍‌ای‍‌ی_کِه_اَوَلِش_خ‍‌وبَن👋🏿🖤",
+      "بودنشان‌زیبآست،نبودنشان‌زیبآتر🫶🏿😴`",
+      "جَهآن‌یآدِگآر‌است‌مآهَم‌رَفتَنی🐉🖤🫠",
+      "از محبت ، گل ها خار میشوند.!!🖤",
+      "ببخشید دوست داشتم .💔🚶‍♂️",
+      "هیچکس‌نبود‌،خودم‌بودم`🖤",
+      "- کآش‌تآآخَر‌مِثلِ‌ا‌َولآ‌بآشیم🖤🪫."
+    ];
+    
+    const textElement = document.getElementById('smartText');
+    const copyBtn = document.getElementById('copyBtn');
+    const snowflakesContainer = document.querySelector('.snowflakes');
+    let currentQuote = '';
+    let animationIndex = 0;
+    let autoUpdateInterval;
+    let hasClicked = false;
+    
+    function getRandomPersianQuote() {
+      const randomIndex = Math.floor(Math.random() * permanentTexts.length);
+      return permanentTexts[randomIndex];
+    }
+    
+    function updateQuote() {
+      textElement.classList.remove('animate-rotate', 'animate-lamp', 'animate-fade');
+      textElement.style.opacity = '0';
+      
+      setTimeout(() => {
+        currentQuote = getRandomPersianQuote();
+        textElement.innerHTML = currentQuote;
+        textElement.classList.remove('welcome-text');
+        textElement.style.fontSize = '1.3rem';
+        textElement.style.color = 'var(--primary)';
         
-        let gameState = {
-            board: [],
-            playerHits: new Set(),
-            aiHits: new Set(),
-            hiddenCells: new Set(),
-            difficulty: 1,
-            currentPlayer: 'human',
-            gameStarted: false,
-            playerName: 'شما',
-            aiName: 'هوش مصنوعی',
-            theme: 'dark'
-        };
+        const animations = ['animate-rotate', 'animate-lamp', 'animate-fade'];
+        textElement.classList.add(animations[animationIndex]);
+        animationIndex = (animationIndex + 1) % animations.length;
         
-        const elements = {
-            themeSwitch: document.getElementById('themeSwitch'),
-            themeIcon: document.getElementById('themeIcon'),
-            themeText: document.getElementById('themeText'),
-            setupScreen: document.getElementById('setupScreen'),
-            gameBoard: document.getElementById('gameBoard'),
-            playerScore: document.getElementById('playerScore'),
-            aiScore: document.getElementById('aiScore'),
-            playerNameDisplay: document.getElementById('playerNameDisplay'),
-            aiNameDisplay: document.getElementById('aiNameDisplay'),
-            message: document.getElementById('message'),
-            restartBtn: document.getElementById('restartBtn'),
-            turnIndicator: document.getElementById('turnIndicator'),
-            playerNameInput: document.getElementById('playerName'),
-            aiNameInput: document.getElementById('aiName'),
-            scoreBoard: document.getElementById('scoreBoard')
-        };
+        textElement.style.opacity = '1';
+      }, 300);
+    }
+    
+    function createSnowflakes() {
+      const snowflakeCount = 80;
+      
+      for (let i = 0; i < snowflakeCount; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.innerHTML = '●';
+        snowflake.style.left = `${Math.random() * 100}vw`;
+        snowflake.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+        snowflake.style.fontSize = `${Math.random() * 10 + 15}px`;
+        snowflake.style.animationDelay = `${Math.random() * 5}s`;
         
-        const sounds = {
-            mineSound: document.getElementById('mineSound'),
-            safeSound: document.getElementById('safeSound'),
-            winSound: document.getElementById('winSound'),
-            loseSound: document.getElementById('loseSound')
-        };
-        
-        const AI_DIFFICULTY = {
-            1: { name: "آسان", delay: 2000, strategy: "random", accuracy: 0.6 },
-            2: { name: "متوسط", delay: 1500, strategy: "smart_random", accuracy: 0.75 },
-            3: { name: "سخت", delay: 1000, strategy: "pattern", accuracy: 0.9 }
-        };
-        
-        function toggleTheme() {
-            if (gameState.theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                gameState.theme = 'light';
-                elements.themeIcon.className = 'fas fa-sun theme-icon';
-                elements.themeText.textContent = 'روشن';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                gameState.theme = 'dark';
-                elements.themeIcon.className = 'fas fa-moon theme-icon';
-                elements.themeText.textContent = 'تاریک';
-            }
-        }
-        
-        function createBoard() {
-            const board = Array(MINES_COUNT).fill('💣').concat(Array(BOARD_SIZE - MINES_COUNT).fill(' '));
-            
-            for (let i = board.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [board[i], board[j]] = [board[j], board[i]];
-            }
-            
-            return board;
-        }
-        
-        function renderBoard() {
-            elements.gameBoard.innerHTML = '';
-            
-            for (let i = 0; i < BOARD_SIZE; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell hidden';
-                cell.dataset.index = i;
-                
-                if (gameState.hiddenCells.has(i + 1)) {
-                    cell.textContent = i + 1;
-                } else if (gameState.playerHits.has(i + 1)) {
-                    cell.className = 'cell mine';
-                    cell.textContent = '💣';
-                } else if (gameState.aiHits.has(i + 1)) {
-                    cell.className = 'cell ai-mine';
-                    cell.textContent = '💣';
-                } else {
-                    cell.className = 'cell safe';
-                    cell.textContent = '';
-                }
-                
-                if (gameState.hiddenCells.has(i + 1) && gameState.currentPlayer === 'human' && gameState.gameStarted) {
-                    cell.addEventListener('click', () => handlePlayerMove(i + 1));
-                }
-                
-                elements.gameBoard.appendChild(cell);
-            }
-            
-            elements.playerScore.textContent = gameState.playerHits.size;
-            elements.aiScore.textContent = gameState.aiHits.size;
-            
-            updateTurnIndicator();
-        }
-        
-        function updateTurnIndicator() {
-            if (!gameState.gameStarted) {
-                elements.turnIndicator.textContent = '';
-                elements.turnIndicator.className = 'turn-indicator';
-                return;
-            }
-            
-            if (gameState.currentPlayer === 'human') {
-                elements.turnIndicator.textContent = `نوبت: ${gameState.playerName}`;
-                elements.turnIndicator.className = 'turn-indicator player-turn';
-            } else {
-                elements.turnIndicator.textContent = `نوبت: ${gameState.aiName}`;
-                elements.turnIndicator.className = 'turn-indicator ai-turn';
-            }
-        }
-        
-        function startGame(difficulty) {
-            gameState = {
-                board: createBoard(),
-                playerHits: new Set(),
-                aiHits: new Set(),
-                hiddenCells: new Set(Array.from({length: BOARD_SIZE}, (_, i) => i + 1)),
-                difficulty: difficulty,
-                currentPlayer: 'human',
-                gameStarted: true,
-                playerName: elements.playerNameInput.value || 'شما',
-                aiName: elements.aiNameInput.value || 'هوش مصنوعی',
-                theme: gameState.theme
-            };
-            
-            elements.playerNameDisplay.textContent = gameState.playerName;
-            elements.aiNameDisplay.textContent = gameState.aiName;
-            
-            elements.setupScreen.style.display = 'none';
-            elements.scoreBoard.style.display = 'flex';
-            elements.turnIndicator.style.display = 'block';
-            elements.gameBoard.style.display = 'grid';
-            
-            elements.message.innerHTML = `<i class="fas fa-flag"></i> سطح: ${AI_DIFFICULTY[difficulty].name} - نوبت ${gameState.playerName} است!`;
-            elements.restartBtn.style.display = 'none';
-            
-            renderBoard();
-        }
-        
-        function handlePlayerMove(cellNumber) {
-            if (!gameState.gameStarted || gameState.currentPlayer !== 'human') return;
-            
-            gameState.hiddenCells.delete(cellNumber);
-            
-            if (gameState.board[cellNumber - 1] === '💣') {
-                gameState.playerHits.add(cellNumber);
-                
-                sounds.mineSound.currentTime = 0;
-                sounds.mineSound.play().catch(e => console.log("Audio play failed"));
-                
-                createExplosionEffect(cellNumber);
-                
-                elements.message.innerHTML = `<i class="fas fa-fire"></i> آفرین! ${gameState.playerName} یک مین پیدا کرد. 🔴`;
-                
-                if (gameState.playerHits.size + gameState.aiHits.size >= MINES_COUNT) {
-                    endGame();
-                    return;
-                }
-                
-                renderBoard();
-            } else {
-                sounds.safeSound.currentTime = 0;
-                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
-                
-                elements.message.innerHTML = `<i class="fas fa-forward"></i> خالی بود! نوبت ${gameState.aiName}.`;
-                gameState.currentPlayer = 'ai';
-                renderBoard();
-                
-                setTimeout(() => makeAIMove(), 1000);
-            }
-        }
-        
-        function makeAIMove() {
-            if (!gameState.gameStarted || gameState.currentPlayer !== 'ai') return;
-            
-            const difficultySettings = AI_DIFFICULTY[gameState.difficulty];
-            let aiChoice;
-            
-            if (difficultySettings.strategy === "random") {
-                const availableCells = Array.from(gameState.hiddenCells);
-                aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
-            } else if (difficultySettings.strategy === "smart_random") {
-                const availableCells = Array.from(gameState.hiddenCells);
-                aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
-                
-                if (Math.random() > difficultySettings.accuracy) {
-                    const safeCells = availableCells.filter(cell => gameState.board[cell - 1] === ' ');
-                    if (safeCells.length > 0) {
-                        aiChoice = safeCells[Math.floor(Math.random() * safeCells.length)];
-                    }
-                }
-            } else {
-                const availableCells = Array.from(gameState.hiddenCells);
-                const primeCells = availableCells.filter(isPrime);
-                
-                if (primeCells.length > 0 && Math.random() < 0.7) {
-                    aiChoice = primeCells[Math.floor(Math.random() * primeCells.length)];
-                } else {
-                    aiChoice = availableCells[Math.floor(Math.random() * availableCells.length)];
-                }
-            }
-            
-            gameState.hiddenCells.delete(aiChoice);
-            
-            if (gameState.board[aiChoice - 1] === '💣') {
-                gameState.aiHits.add(aiChoice);
-                
-                sounds.mineSound.currentTime = 0;
-                sounds.mineSound.play().catch(e => console.log("Audio play failed"));
-                
-                createExplosionEffect(aiChoice);
-                
-                elements.message.innerHTML = `<i class="fas fa-robot"></i> ${gameState.aiName} یک مین پیدا کرد! 🔵`;
-                
-                if (gameState.playerHits.size + gameState.aiHits.size >= MINES_COUNT) {
-                    endGame();
-                    return;
-                }
-                
-                setTimeout(() => makeAIMove(), difficultySettings.delay);
-                renderBoard();
-            } else {
-                sounds.safeSound.currentTime = 0;
-                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
-                
-                elements.message.innerHTML = `<i class="fas fa-backward"></i> ${gameState.aiName} اشتباه کرد! نوبت ${gameState.playerName}.`;
-                gameState.currentPlayer = 'human';
-                renderBoard();
-            }
-        }
-        
-        function isPrime(num) {
-            if (num <= 1) return false;
-            if (num <= 3) return true;
-            if (num % 2 === 0 || num % 3 === 0) return false;
-            for (let i = 5; i * i <= num; i += 6) {
-                if (num % i === 0 || num % (i + 2) === 0) return false;
-            }
-            return true;
-        }
-        
-        function createExplosionEffect(cellNumber) {
-            const cellIndex = cellNumber - 1;
-            const cell = document.querySelector(`.cell[data-index="${cellIndex}"]`);
-            if (cell) {
-                const explosion = document.createElement('div');
-                explosion.className = 'explosion';
-                cell.appendChild(explosion);
-                
-                setTimeout(() => {
-                    if (cell.contains(explosion)) {
-                        cell.removeChild(explosion);
-                    }
-                }, 500);
-            }
-        }
-        
-        function endGame() {
-            gameState.gameStarted = false;
-            
-            if (gameState.playerHits.size > gameState.aiHits.size) {
-                sounds.winSound.currentTime = 0;
-                sounds.winSound.play().catch(e => console.log("Audio play failed"));
-                elements.message.innerHTML = `<i class="fas fa-trophy"></i> 🎉 ${gameState.playerName} برنده شد! 🎉`;
-                elements.message.style.animation = 'celebrate 1s infinite';
-            } else if (gameState.playerHits.size < gameState.aiHits.size) {
-                sounds.loseSound.currentTime = 0;
-                sounds.loseSound.play().catch(e => console.log("Audio play failed"));
-                elements.message.innerHTML = `<i class="fas fa-robot"></i> 🤖 ${gameState.aiName} برنده شد! 🤖`;
-            } else {
-                sounds.safeSound.currentTime = 0;
-                sounds.safeSound.play().catch(e => console.log("Audio play failed"));
-                elements.message.innerHTML = `<i class="fas fa-handshake"></i> ⚡ مساوی شد! ⚡`;
-            }
-            
-            elements.restartBtn.style.display = 'flex';
-            renderBoard();
-        }
-        
-        elements.themeSwitch.addEventListener('click', toggleTheme);
-        
-        document.querySelectorAll('.difficulty-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const difficulty = parseInt(button.dataset.level);
-                startGame(difficulty);
-            });
+        snowflakesContainer.appendChild(snowflake);
+        animateSnowflake(snowflake);
+      }
+    }
+    
+    function animateSnowflake(snowflake) {
+      const duration = parseFloat(snowflake.style.animationDuration);
+      snowflake.style.top = '-20px';
+      
+      snowflake.animate([
+        { top: '-20px', transform: 'translateX(0)' },
+        { top: '100vh', transform: `translateX(${Math.random() * 100 - 50}px)` }
+      ], {
+        duration: duration * 1000,
+        iterations: Infinity
+      });
+    }
+    
+    function startSnowEffect() {
+      setTimeout(() => {
+        createSnowflakes();
+      }, 20000);
+    }
+    
+    copyBtn.addEventListener('click', () => {
+      if(currentQuote) {
+        navigator.clipboard.writeText(currentQuote).then(() => {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = 'COPIED!';
+          
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+          }, 2000);
         });
-        
-        elements.restartBtn.addEventListener('click', () => {
-            elements.setupScreen.style.display = 'block';
-            elements.scoreBoard.style.display = 'none';
-            elements.turnIndicator.style.display = 'none';
-            elements.gameBoard.style.display = 'none';
-            elements.message.innerHTML = `<i class="fas fa-info-circle"></i>  سطح دشواری را انتخاب کنید`;
-            elements.message.style.animation = 'none';
-            elements.restartBtn.style.display = 'none';
-            elements.playerScore.textContent = '0';
-            elements.aiScore.textContent = '0';
-            elements.turnIndicator.textContent = '';
-            elements.turnIndicator.className = 'turn-indicator';
-        });
-    </script>
+      }
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const startAutoUpdate = setTimeout(() => {
+        if(!hasClicked) {
+          autoUpdateInterval = setInterval(updateQuote, 15000);
+        }
+      }, 15000);
+      
+      textElement.addEventListener('click', () => {
+        if(!hasClicked) {
+          hasClicked = true;
+          clearTimeout(startAutoUpdate);
+          clearInterval(autoUpdateInterval);
+          updateQuote();
+        }
+      });
+      
+      textElement.style.cursor = 'pointer';
+      textElement.title = 'Click for new quote';
+      
+      startSnowEffect();
+    });
+  </script>
 </body>
-</html>
+            </html>
